@@ -3,7 +3,6 @@
 
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Image from 'next/image';
 import { ArrowLeft, Star, ShoppingCart, Plus, Minus, Shield, Truck, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -80,12 +79,10 @@ const ProductDetail = () => {
             {/* Product Image */}
             <div className="space-y-4">
               <div className="aspect-square relative rounded-2xl overflow-hidden bg-white shadow-lg">
-                <Image
+                <img
                   src={product.image}
                   alt={product.name}
-                  fill
-                  className="object-cover"
-                  priority
+                  className="w-full h-full object-cover"
                 />
                 {discountPercentage > 0 && (
                   <Badge 

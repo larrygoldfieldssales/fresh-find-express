@@ -2,8 +2,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import { Link } from 'react-router-dom';
 import { ArrowRight, Clock, Truck, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -37,7 +36,7 @@ const Index = () => {
                   delivered right to your doorstep. Fast, fresh, and convenient.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/shop">
+                  <Link to="/shop">
                     <Button size="lg" className="bg-grocery-600 hover:bg-grocery-700 w-full sm:w-auto">
                       Start Shopping
                       <ArrowRight className="ml-2 h-5 w-5" />
@@ -51,12 +50,10 @@ const Index = () => {
               
               <div className="relative animate-slide-up">
                 <div className="aspect-square relative rounded-2xl overflow-hidden shadow-2xl">
-                  <Image
+                  <img
                     src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&h=600&fit=crop"
                     alt="Fresh groceries"
-                    fill
-                    className="object-cover"
-                    priority
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 {/* Floating Badge */}
@@ -136,17 +133,16 @@ const Index = () => {
               {categories.map((category) => (
                 <Link 
                   key={category.id} 
-                  href={`/shop?category=${category.id}`}
+                  to={`/shop?category=${category.id}`}
                   className="group"
                 >
                   <Card className="hover:shadow-md transition-all duration-200 hover:-translate-y-1">
                     <CardContent className="p-4 text-center">
                       <div className="aspect-square relative rounded-lg overflow-hidden mb-3">
-                        <Image
+                        <img
                           src={category.image}
                           alt={category.name}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-200"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                         />
                       </div>
                       <h3 className="font-semibold text-sm group-hover:text-grocery-600 transition-colors">
@@ -162,7 +158,7 @@ const Index = () => {
             </div>
             
             <div className="text-center">
-              <Link href="/shop">
+              <Link to="/shop">
                 <Button variant="outline" size="lg">
                   View All Categories
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -191,7 +187,7 @@ const Index = () => {
             </div>
             
             <div className="text-center">
-              <Link href="/shop">
+              <Link to="/shop">
                 <Button size="lg" className="bg-grocery-600 hover:bg-grocery-700">
                   Shop All Products
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -211,7 +207,7 @@ const Index = () => {
               Join thousands of satisfied customers who trust FreshExpress for their grocery needs. 
               Fresh products, fast delivery, guaranteed quality.
             </p>
-            <Link href="/shop">
+            <Link to="/shop">
               <Button size="lg" variant="secondary">
                 Start Shopping Now
                 <ArrowRight className="ml-2 h-5 w-5" />

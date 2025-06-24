@@ -3,7 +3,6 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Image from 'next/image';
 import { CreditCard, MapPin, Clock, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -245,11 +244,10 @@ const Checkout = () => {
                   {items.map((item) => (
                     <div key={item.id} className="flex items-center gap-3">
                       <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                        <Image
+                        <img
                           src={item.product.image}
                           alt={item.product.name}
-                          fill
-                          className="object-cover"
+                          className="w-full h-full object-cover"
                         />
                       </div>
                       <div className="flex-1 min-w-0">

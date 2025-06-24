@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { CheckCircle, Clock, MapPin, Package, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -191,14 +191,14 @@ const OrderConfirmation = () => {
 
             {/* Action Buttons */}
             <div className="space-y-4">
-              <Link href="/shop" className="block">
+              <Link to="/shop" className="block">
                 <Button size="lg" className="w-full bg-grocery-600 hover:bg-grocery-700">
                   Continue Shopping
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
               
-              <Link href="/" className="block">
+              <Link to="/" className="block">
                 <Button variant="outline" size="lg" className="w-full">
                   Back to Home
                 </Button>

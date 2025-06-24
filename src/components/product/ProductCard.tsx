@@ -2,8 +2,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import { Link } from 'react-router-dom';
 import { Star, ShoppingCart, Plus, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -36,16 +35,15 @@ export function ProductCard({ product }: ProductCardProps) {
     : 0;
 
   return (
-    <Link href={`/product/${product.id}`}>
+    <Link to={`/product/${product.id}`}>
       <Card className="group hover:shadow-lg transition-all duration-200 hover:-translate-y-1 cursor-pointer overflow-hidden">
         <CardContent className="p-0">
           {/* Product Image */}
           <div className="relative aspect-square overflow-hidden">
-            <Image
+            <img
               src={product.image}
               alt={product.name}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-200"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
             />
             {discountPercentage > 0 && (
               <Badge 

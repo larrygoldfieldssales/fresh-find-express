@@ -1,6 +1,6 @@
 
 import React from 'react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 
 export function Footer() {
   return (
@@ -28,17 +28,17 @@ export function Footer() {
             <h3 className="font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2 text-gray-400">
               <li>
-                <Link href="/" className="hover:text-white transition-colors">
+                <Link to="/" className="hover:text-white transition-colors">
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/shop" className="hover:text-white transition-colors">
+                <Link to="/shop" className="hover:text-white transition-colors">
                   Shop
                 </Link>
               </li>
               <li>
-                <Link href="/cart" className="hover:text-white transition-colors">
+                <Link to="/cart" className="hover:text-white transition-colors">
                   Cart
                 </Link>
               </li>

@@ -2,8 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,12 +13,12 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { getCartItemCount } = useCart();
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery('');
       setIsMenuOpen(false);
     }
@@ -32,7 +31,7 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <div className="h-8 w-8 rounded-lg bg-grocery-600 flex items-center justify-center">
               <span className="text-white font-bold text-lg">60</span>
             </div>
@@ -43,10 +42,10 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/" className="text-sm font-medium hover:text-grocery-600 transition-colors">
+            <Link to="/" className="text-sm font-medium hover:text-grocery-600 transition-colors">
               Home
             </Link>
-            <Link href="/shop" className="text-sm font-medium hover:text-grocery-600 transition-colors">
+            <Link to="/shop" className="text-sm font-medium hover:text-grocery-600 transition-colors">
               Shop
             </Link>
           </nav>
@@ -68,7 +67,7 @@ export function Header() {
           {/* Cart & Mobile Menu */}
           <div className="flex items-center space-x-4">
             {/* Cart */}
-            <Link href="/cart">
+            <Link to="/cart">
               <Button variant="ghost" size="sm" className="relative">
                 <ShoppingCart className="h-5 w-5" />
                 {cartItemCount > 0 && (
@@ -112,14 +111,14 @@ export function Header() {
             {/* Mobile Navigation */}
             <nav className="flex flex-col space-y-3">
               <Link 
-                href="/" 
+                to="/" 
                 className="text-sm font-medium hover:text-grocery-600 py-2 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Home
               </Link>
               <Link 
-                href="/shop" 
+                to="/shop" 
                 className="text-sm font-medium hover:text-grocery-600 py-2 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >

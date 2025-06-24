@@ -2,8 +2,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import { Link } from 'react-router-dom';
 import { Plus, Minus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,7 +33,7 @@ const Cart = () => {
                 Looks like you haven't added any items to your cart yet. 
                 Start shopping to fill it up!
               </p>
-              <Link href="/shop">
+              <Link to="/shop">
                 <Button size="lg" className="bg-grocery-600 hover:bg-grocery-700">
                   Start Shopping
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -74,18 +73,17 @@ const Cart = () => {
                     <div className="flex items-center gap-4">
                       {/* Product Image */}
                       <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                        <Image
+                        <img
                           src={item.product.image}
                           alt={item.product.name}
-                          fill
-                          className="object-cover"
+                          className="w-full h-full object-cover"
                         />
                       </div>
 
                       {/* Product Info */}
                       <div className="flex-1 min-w-0">
                         <Link 
-                          href={`/product/${item.product.id}`}
+                          to={`/product/${item.product.id}`}
                           className="font-semibold text-gray-900 hover:text-grocery-600 transition-colors"
                         >
                           {item.product.name}
@@ -178,7 +176,7 @@ const Cart = () => {
                     <span>${total.toFixed(2)}</span>
                   </div>
 
-                  <Link href="/checkout" className="block">
+                  <Link to="/checkout" className="block">
                     <Button size="lg" className="w-full bg-grocery-600 hover:bg-grocery-700">
                       Proceed to Checkout
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -186,7 +184,7 @@ const Cart = () => {
                   </Link>
 
                   <div className="text-center pt-4">
-                    <Link href="/shop">
+                    <Link to="/shop">
                       <Button variant="outline" size="sm">
                         Continue Shopping
                       </Button>
