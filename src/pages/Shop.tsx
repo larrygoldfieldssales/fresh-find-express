@@ -22,7 +22,7 @@ const Shop = () => {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>('popular');
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Initialize filters from URL params
@@ -90,7 +90,7 @@ const Shop = () => {
   const clearFilters = () => {
     setSelectedCategories([]);
     setSearchQuery('');
-    setPriceRange([0, 50]);
+    setPriceRange([0, 1000]);
     setSortBy('popular');
   };
 
@@ -139,7 +139,7 @@ const Shop = () => {
             />
           </div>
           <p className="text-xs text-gray-500">
-            ${priceRange[0]} - ${priceRange[1]}
+            R{priceRange[0]} - R{priceRange[1]}
           </p>
         </div>
       </div>

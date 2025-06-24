@@ -123,11 +123,11 @@ const ProductDetail = () => {
               {/* Price */}
               <div className="flex items-center gap-4">
                 <span className="text-3xl font-bold text-gray-900">
-                  ${product.price.toFixed(2)}
+                  R{product.price.toFixed(2)}
                 </span>
                 {product.originalPrice && (
                   <span className="text-xl text-gray-500 line-through">
-                    ${product.originalPrice.toFixed(2)}
+                    R{product.originalPrice.toFixed(2)}
                   </span>
                 )}
                 <span className="text-sm text-gray-500">
@@ -201,7 +201,7 @@ const ProductDetail = () => {
                         className="flex-1 bg-grocery-600 hover:bg-grocery-700"
                       >
                         <ShoppingCart className="h-5 w-5 mr-2" />
-                        Add to Cart - ${(product.price * quantity).toFixed(2)}
+                        Add to Cart - R{(product.price * quantity).toFixed(2)}
                       </Button>
                     </div>
                   )}

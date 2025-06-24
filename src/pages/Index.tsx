@@ -109,7 +109,7 @@ const Index = () => {
                   </div>
                   <h3 className="font-semibold text-xl mb-2">Free Delivery</h3>
                   <p className="text-gray-600">
-                    Free delivery on orders over $50. No hidden fees or charges.
+                    Free delivery on orders over R900. No hidden fees or charges.
                   </p>
                 </CardContent>
               </Card>

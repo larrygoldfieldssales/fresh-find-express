@@ -89,7 +89,7 @@ const OrderConfirmation = () => {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-lg">${order.total.toFixed(2)}</p>
+                    <p className="font-bold text-lg">R{order.total.toFixed(2)}</p>
                   </div>
                 </div>
 
@@ -104,7 +104,7 @@ const OrderConfirmation = () => {
                         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                       </div>
                       <p className="font-medium">
-                        ${(item.product.price * item.quantity).toFixed(2)}
+                        R{(item.product.price * item.quantity).toFixed(2)}
                       </p>
                     </div>
                   ))}
@@ -115,7 +115,7 @@ const OrderConfirmation = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>${(order.total - order.deliveryFee).toFixed(2)}</span>
+                    <span>R{(order.total - order.deliveryFee).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Delivery Fee</span>
@@ -123,13 +123,13 @@ const OrderConfirmation = () => {
                       {order.deliveryFee === 0 ? (
                         <span className="text-green-600">FREE</span>
                       ) : (
-                        `$${order.deliveryFee.toFixed(2)}`
+                        `R${order.deliveryFee.toFixed(2)}`
                       )}
                     </span>
                   </div>
                   <div className="flex justify-between font-bold text-lg">
                     <span>Total</span>
-                    <span>${order.total.toFixed(2)}</span>
+                    <span>R{order.total.toFixed(2)}</span>
                   </div>
                 </div>
               </CardContent>
@@ -179,7 +179,7 @@ const OrderConfirmation = () => {
                   <Package className="h-8 w-8 text-grocery-600" />
                   <div>
                     <p className="font-medium text-grocery-800">
-                      Your order is being prepared
+                      Your order is being prepared  
                     </p>
                     <p className="text-sm text-grocery-600">
                       Estimated delivery: {estimatedDelivery.toLocaleTimeString()}

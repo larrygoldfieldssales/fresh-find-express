@@ -3,38 +3,56 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, MapPin, Clock, Shield } from 'lucide-react';
+import { ArrowLeft, CreditCard, MapPin, Plus, Minus, Trash2 } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useCart } from '@/context/CartContext';
-import { CheckoutForm, Order } from '@/types';
+import { Order, CheckoutForm } from '@/types';
 import { STORAGE_KEYS, setToStorage, getFromStorage } from '@/lib/localStorage';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
+
+const checkoutFormSchema = z.object({
+  firstName: z.string().min(2, 'First name must be at least 2 characters'),
+  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email address'),
+  phone: z.string().min(10, 'Please enter a valid phone number'),
+  address: z.string().min(5, 'Please enter your full address'),
+  city: z.string().min(2, 'Please enter your city'),
+  postalCode: z.string().min(4, 'Please enter a valid postal code'),
+  deliveryInstructions: z.string().optional(),
+});
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { items, getCartTotal, clearCart } = useCart();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState<CheckoutForm>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    postalCode: '',
-    deliveryInstructions: ''
+  const { items, updateQuantity, removeFromCart, getCartTotal, clearCart } = useCart();
+  const { toast } = useToast();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const form = useForm<CheckoutForm>({
+    resolver: zodResolver(checkoutFormSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      address: '',
+      city: '',
+      postalCode: '',
+      deliveryInstructions: '',
+    },
   });
 
   const subtotal = getCartTotal();
-  const deliveryFee = subtotal >= 50 ? 0 : 4.99;
+  const deliveryFee = subtotal >= 900 ? 0 : 89.99;
   const total = subtotal + deliveryFee;
 
   // Redirect if cart is empty
@@ -43,60 +61,48 @@ const Checkout = () => {
     return null;
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    // Validate form
-    const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'postalCode'];
-    const missingFields = requiredFields.filter(field => !formData[field as keyof CheckoutForm]);
+  const onSubmit = async (data: CheckoutForm) => {
+    setIsProcessing(true);
     
-    if (missingFields.length > 0) {
+    try {
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Create order
+      const order: Order = {
+        id: `order_${Date.now()}`,
+        items,
+        total,
+        deliveryFee,
+        checkoutForm: data,
+        createdAt: new Date().toISOString(),
+        status: 'pending',
+      };
+
+      // Save order to localStorage
+      const existingOrders = getFromStorage<Order[]>(STORAGE_KEYS.ORDERS, []);
+      setToStorage(STORAGE_KEYS.ORDERS, [...existingOrders, order]);
+
+      // Clear cart
+      clearCart();
+
+      // Show success message
       toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
+        title: "Order placed successfully!",
+        description: "You will receive a confirmation email shortly.",
+      });
+
+      // Redirect to confirmation page
+      navigate(`/order-confirmation?orderId=${order.id}`);
+    } catch (error) {
+      toast({
+        title: "Order failed",
+        description: "There was an error processing your order. Please try again.",
         variant: "destructive",
       });
-      setIsSubmitting(false);
-      return;
+    } finally {
+      setIsProcessing(false);
     }
-
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // Create order
-    const order: Order = {
-      id: `order_${Date.now()}`,
-      items: [...items],
-      total,
-      deliveryFee,
-      checkoutForm: formData,
-      createdAt: new Date().toISOString(),
-      status: 'pending'
-    };
-
-    // Save order to localStorage
-    const existingOrders = getFromStorage<Order[]>(STORAGE_KEYS.ORDERS, []);
-    setToStorage(STORAGE_KEYS.ORDERS, [...existingOrders, order]);
-
-    // Save checkout form for future use
-    setToStorage(STORAGE_KEYS.CHECKOUT_FORM, formData);
-
-    // Clear cart
-    clearCart();
-
-    toast({
-      title: "Order Placed Successfully!",
-      description: "Your order has been confirmed and will be delivered within 60 minutes.",
-    });
-
-    // Redirect to confirmation page
-    navigate(`/order-confirmation?orderId=${order.id}`);
   };
 
   return (
@@ -105,112 +111,148 @@ const Checkout = () => {
       
       <main className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
+          {/* Back Button */}
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/cart')}
+            className="mb-6"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Cart
+          </Button>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Checkout Form */}
-            <div className="space-y-6">
-              {/* Delivery Information */}
+            <div className="lg:col-span-2 space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-grocery-600" />
+                    <MapPin className="h-5 w-5" />
                     Delivery Information
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="firstName">First Name *</Label>
-                      <Input
-                        id="firstName"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                        required
+                <CardContent>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="firstName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>First Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="John" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="lastName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Last Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Doe" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email</FormLabel>
+                              <FormControl>
+                                <Input type="email" placeholder="john@example.com" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="phone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Phone Number</FormLabel>
+                              <FormControl>
+                                <Input placeholder="0123456789" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name="address"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Street Address</FormLabel>
+                            <FormControl>
+                              <Input placeholder="123 Main Street" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName">Last Name *</Label>
-                      <Input
-                        id="lastName"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        required
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="city"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>City</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Cape Town" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="postalCode"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Postal Code</FormLabel>
+                              <FormControl>
+                                <Input placeholder="8001" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name="deliveryInstructions"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Delivery Instructions (Optional)</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Ring the doorbell, leave at gate, etc." 
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="email">Email Address *</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="phone">Phone Number *</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="address">Street Address *</Label>
-                    <Input
-                      id="address"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="city">City *</Label>
-                      <Input
-                        id="city"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="postalCode">Postal Code *</Label>
-                      <Input
-                        id="postalCode"
-                        name="postalCode"
-                        value={formData.postalCode}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="deliveryInstructions">Delivery Instructions (Optional)</Label>
-                    <Textarea
-                      id="deliveryInstructions"
-                      name="deliveryInstructions"
-                      value={formData.deliveryInstructions}
-                      onChange={handleInputChange}
-                      placeholder="e.g., Leave at front door, Ring doorbell, etc."
-                      rows={3}
-                    />
-                  </div>
+                    </form>
+                  </Form>
                 </CardContent>
               </Card>
 
@@ -218,15 +260,15 @@ const Checkout = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <CreditCard className="h-5 w-5 text-grocery-600" />
+                    <CreditCard className="h-5 w-5" />
                     Payment Method
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="bg-gray-100 p-4 rounded-lg text-center">
-                    <p className="text-gray-600">
-                      Payment methods will be integrated later. 
-                      This is a demo checkout process.
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <p className="text-green-800 font-medium">Cash on Delivery</p>
+                    <p className="text-green-600 text-sm mt-1">
+                      Pay with cash when your order is delivered to your door.
                     </p>
                   </div>
                 </CardContent>
@@ -234,98 +276,122 @@ const Checkout = () => {
             </div>
 
             {/* Order Summary */}
-            <div className="space-y-6">
-              {/* Order Items */}
-              <Card>
+            <div className="lg:col-span-1">
+              <Card className="sticky top-24">
                 <CardHeader>
                   <CardTitle>Order Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {items.map((item) => (
-                    <div key={item.id} className="flex items-center gap-3">
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                        <img
-                          src={item.product.image}
-                          alt={item.product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">
-                          {item.product.name}
+                  {/* Order Items */}
+                  <div className="space-y-3">
+                    {items.map((item) => (
+                      <div key={item.id} className="flex items-center gap-3">
+                        <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                          <img
+                            src={item.product.image}
+                            alt={item.product.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm line-clamp-1">
+                            {item.product.name}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              disabled={item.quantity <= 1}
+                              className="h-6 w-6 p-0"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </Button>
+                            <span className="text-sm font-medium min-w-[20px] text-center">
+                              {item.quantity}
+                            </span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              className="h-6 w-6 p-0"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeFromCart(item.id)}
+                              className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                        <p className="font-medium text-sm">
+                          R{(item.product.price * item.quantity).toFixed(2)}
                         </p>
-                        <p className="text-xs text-gray-500">
-                          Qty: {item.quantity}
-                        </p>
                       </div>
-                      <p className="font-medium text-sm">
-                        ${(item.product.price * item.quantity).toFixed(2)}
-                      </p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
 
                   <Separator />
 
+                  {/* Order Totals */}
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span>Subtotal</span>
-                      <span>${subtotal.toFixed(2)}</span>
+                      <span>Subtotal ({items.length} items)</span>
+                      <span className="font-medium">R{subtotal.toFixed(2)}</span>
                     </div>
+                    
                     <div className="flex justify-between">
                       <span>Delivery Fee</span>
-                      <span>
+                      <span className="font-medium">
                         {deliveryFee === 0 ? (
                           <span className="text-green-600">FREE</span>
                         ) : (
-                          `$${deliveryFee.toFixed(2)}`
+                          `R${deliveryFee.toFixed(2)}`
                         )}
                       </span>
                     </div>
+
+                    {subtotal < 900 && (
+                      <p className="text-sm text-gray-600">
+                        Add R{(900 - subtotal).toFixed(2)} more for free delivery
+                      </p>
+                    )}
+
                     <Separator />
+
                     <div className="flex justify-between text-lg font-bold">
                       <span>Total</span>
-                      <span>${total.toFixed(2)}</span>
+                      <span>R{total.toFixed(2)}</span>
                     </div>
+                  </div>
+
+                  {/* Place Order Button */}
+                  <Button 
+                    onClick={form.handleSubmit(onSubmit)}
+                    disabled={isProcessing}
+                    size="lg" 
+                    className="w-full bg-grocery-600 hover:bg-grocery-700"
+                  >
+                    {isProcessing ? (
+                      "Processing Order..."
+                    ) : (
+                      `Place Order - R${total.toFixed(2)}`
+                    )}
+                  </Button>
+
+                  {/* Security Notice */}
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-xs text-gray-600 text-center">
+                      Your order will be confirmed and prepared immediately. 
+                      Estimated delivery time: 60 minutes or less.
+                    </p>
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Delivery Promise */}
-              <Card>
-                <CardContent className="p-6">
-                  <div className="grid grid-cols-2 gap-4 text-center">
-                    <div>
-                      <Clock className="h-8 w-8 text-grocery-600 mx-auto mb-2" />
-                      <p className="text-sm font-medium">60min Delivery</p>
-                    </div>
-                    <div>
-                      <Shield className="h-8 w-8 text-grocery-600 mx-auto mb-2" />
-                      <p className="text-sm font-medium">Quality Guaranteed</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Place Order Button */}
-              <Button 
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                size="lg"
-                className="w-full bg-grocery-600 hover:bg-grocery-700"
-              >
-                {isSubmitting ? (
-                  <>
-                    <LoadingSpinner size="sm" className="mr-2" />
-                    Processing Order...
-                  </>
-                ) : (
-                  `Place Order - $${total.toFixed(2)}`
-                )}
-              </Button>
-
-              <p className="text-xs text-gray-500 text-center">
-                By placing this order, you agree to our terms and conditions.
-              </p>
             </div>
           </div>
         </div>

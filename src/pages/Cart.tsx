@@ -15,7 +15,7 @@ const Cart = () => {
   const { items, updateQuantity, removeFromCart, getCartTotal, clearCart } = useCart();
 
   const subtotal = getCartTotal();
-  const deliveryFee = subtotal >= 50 ? 0 : 4.99;
+  const deliveryFee = subtotal >= 900 ? 0 : 89.99;
   const total = subtotal + deliveryFee;
 
   if (items.length === 0) {
@@ -92,7 +92,7 @@ const Cart = () => {
                           {item.product.unit}
                         </p>
                         <p className="font-bold text-lg mt-2">
-                          ${item.product.price.toFixed(2)}
+                          R{item.product.price.toFixed(2)}
                         </p>
                       </div>
 
@@ -123,7 +123,7 @@ const Cart = () => {
                       {/* Item Total */}
                       <div className="text-right">
                         <p className="font-bold text-lg">
-                          ${(item.product.price * item.quantity).toFixed(2)}
+                          R{(item.product.price * item.quantity).toFixed(2)}
                         </p>
                         <Button
                           variant="ghost"
@@ -149,7 +149,7 @@ const Cart = () => {
                 <CardContent className="space-y-4">
                   <div className="flex justify-between">
                     <span>Subtotal ({items.length} items)</span>
-                    <span className="font-medium">${subtotal.toFixed(2)}</span>
+                    <span className="font-medium">R{subtotal.toFixed(2)}</span>
                   </div>
                   
                   <div className="flex justify-between">
@@ -158,14 +158,14 @@ const Cart = () => {
                       {deliveryFee === 0 ? (
                         <span className="text-green-600">FREE</span>
                       ) : (
-                        `$${deliveryFee.toFixed(2)}`
+                        `R${deliveryFee.toFixed(2)}`
                       )}
                     </span>
                   </div>
 
-                  {subtotal < 50 && (
+                  {subtotal < 900 && (
                     <p className="text-sm text-gray-600">
-                      Add ${(50 - subtotal).toFixed(2)} more for free delivery
+                      Add R{(900 - subtotal).toFixed(2)} more for free delivery
                     </p>
                   )}
 
@@ -173,7 +173,7 @@ const Cart = () => {
 
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>R{total.toFixed(2)}</span>
                   </div>
 
                   <Link to="/checkout" className="block">
@@ -198,7 +198,7 @@ const Cart = () => {
                     </h4>
                     <ul className="text-sm text-grocery-700 space-y-1">
                       <li>• Delivery in 60 minutes or less</li>
-                      <li>• Free delivery on orders over $50</li>
+                      <li>• Free delivery on orders over R900</li>
                       <li>• Quality guarantee on all products</li>
                     </ul>
                   </div>
