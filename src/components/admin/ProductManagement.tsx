@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -237,6 +236,7 @@ export function ProductManagement() {
                   </DialogDescription>
                 </DialogHeader>
                 
+                
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Product Name *</Label>
@@ -342,7 +342,8 @@ export function ProductManagement() {
           </div>
         </CardHeader>
         <CardContent>
-          {/* Search and Filter */}
+          
+          
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -437,12 +438,10 @@ export function ProductManagement() {
                           <Switch
                             checked={product.inStock}
                             onCheckedChange={() => toggleStock(product.id)}
-                            size="sm"
                           />
                           <Switch
                             checked={product.featured}
                             onCheckedChange={() => toggleFeatured(product.id)}
-                            size="sm"
                           />
                         </div>
                       </div>

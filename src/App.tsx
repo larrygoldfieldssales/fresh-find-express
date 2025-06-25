@@ -2,8 +2,8 @@
 import { Routes, Route } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { Toaster } from './components/ui/toaster';
-import Header from './components/layout/Header';
-import Footer from './components/layout/Footer';
+import { Header } from './components/layout/Header';
+import { Footer } from './components/layout/Footer';
 import Index from './pages/Index';
 import Shop from './pages/Shop';
 import ProductDetail from './pages/ProductDetail';
