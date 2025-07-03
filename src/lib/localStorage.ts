@@ -3,7 +3,10 @@ export const STORAGE_KEYS = {
   CART: 'sixty60_cart',
   CHECKOUT_FORM: 'sixty60_checkout_form',
   ORDERS: 'sixty60_orders',
-  SEARCH_HISTORY: 'sixty60_search_history'
+  SEARCH_HISTORY: 'sixty60_search_history',
+  CURRENT_USER: 'current_user',
+  REGISTERED_USERS: 'registered_users',
+  USER_PASSWORDS: 'user_passwords'
 } as const;
 
 export const getFromStorage = <T>(key: string, defaultValue: T): T => {
